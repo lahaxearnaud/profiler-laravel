@@ -27,7 +27,7 @@ class ApiTest extends TestCase
         $this->get('api/profiler/profiles?' . http_build_query([
                 'offset' => -1
             ]));
-        $this->assertJson('');
+        $this->isJson();
         $this->assertResponseStatus(400);
 
         $this->get('api/profiler/profiles?' . http_build_query([
