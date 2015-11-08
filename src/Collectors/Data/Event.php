@@ -42,6 +42,8 @@ class Event extends \Ndrx\Profiler\Collectors\Data\Event
                 'param' => json_encode($param),
                 'time' => microtime(true)
             ];
+
+            $this->stream();
         });
     }
 

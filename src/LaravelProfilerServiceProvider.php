@@ -8,7 +8,8 @@
 
 namespace Ndrx\Profiler\Laravel;
 
-use Illuminate\Support\Facades\Event;
+use Illuminate\Hashing\BcryptHasher;
+use Illuminate\Support\Facades\Route;
 use Monolog\Logger;
 use Ndrx\Profiler\Collectors\Data\Context;
 use Ndrx\Profiler\Collectors\Data\CpuUsage;
@@ -20,6 +21,7 @@ use Ndrx\Profiler\Collectors\Data\Timeline;
 use Ndrx\Profiler\Components\Logs\Monolog;
 use Ndrx\Profiler\Laravel\Collectors\Data\Config;
 use Ndrx\Profiler\Laravel\Collectors\Data\Database;
+use Ndrx\Profiler\Laravel\Collectors\Data\Event;
 use Ndrx\Profiler\Laravel\Collectors\Data\User;
 use Ndrx\Profiler\Laravel\Http\Controllers\Profiler;
 use Ndrx\Profiler\NullProfiler;
@@ -35,13 +37,16 @@ class LaravelProfilerServiceProvider extends \Illuminate\Support\ServiceProvider
      */
     public function register()
     {
-        $enable = env('APP_DEBUG', false);
+        $this->app['hash'] = $this->app->share(function () {
+            return new BcryptHasher();
+        });
+        $enable = 1 == env('APP_DEBUG', false);
         /** @var Logger $logger */
         $logger = $this->app->make('log');
         try {
             $profiler = ProfilerFactory::build([
                 ProfilerFactory::OPTION_ENABLE => $enable,
-                ProfilerFactory::OPTION_DATASOURCE_PROFILES_FOLDER => storage_path('profiler' . DIRECTORY_SEPARATOR),
+                ProfilerFactory::OPTION_DATASOURCE_PROFILES_FOLDER => '/tmp/profiler/',
                 ProfilerFactory::OPTION_COLLECTORS => [
                     PhpVersion::class,
                     CpuUsage::class,
@@ -69,29 +74,30 @@ class LaravelProfilerServiceProvider extends \Illuminate\Support\ServiceProvider
             $profiler = new NullProfiler();
         }
 
-        $profiler->initiate();
-
         if ($enable) {
-            $logger->pushHandler($profiler->getLogger());
+            $logger->getMonolog()->pushHandler($profiler->getLogger());
             $this->registerCors();
             $this->registerRoutes();
         }
 
-        $this->app->bind('profiler', $profiler);
+        $profiler->initiate();
+
+        $this->app->instance('profiler', $profiler);
     }
 
-    protected function registerCors ()
+    protected function registerCors()
     {
-        $this->app->register('Barryvdh\Cors\HandleCors');
+        if (!headers_sent()) {
+            header('Access-Control-Allow-Headers: *');
+            header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH');
+        }
     }
 
-    protected function registerRoutes ()
+    protected function registerRoutes()
     {
-        $this->app->group(['middleware' => 'cors'], function () {
-            $this->app->get('api/profiler/profiles', ['as' => 'profiler.profiles.list', 'uses' => Profiler::class . '@index']);
-            $this->app->get('api/profiler/profiles/{id}', ['as' => 'profiler.profiles.show', 'uses' => Profiler::class . '@show']);
-            $this->app->delete('api/profiler/profiles', ['as' => 'profiler.profiles.clear', 'uses' => Profiler::class . '@clear']);
-        });
+        Route::get('api/profiler/profiles', ['as' => 'profiler.profiles.list', 'uses' => Profiler::class . '@index']);
+        Route::get('api/profiler/profiles/{id}', ['as' => 'profiler.profiles.show', 'uses' => Profiler::class . '@show']);
+        Route::delete('api/profiler/profiles', ['as' => 'profiler.profiles.clear', 'uses' => Profiler::class . '@clear']);
     }
 
 }

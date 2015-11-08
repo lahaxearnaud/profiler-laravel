@@ -8,11 +8,16 @@
 
 namespace Ndrx\Profiler\Laravel;
 
+use Ndrx\Profiler\Laravel\Http\Controllers\Profiler;
+
 class LumenProfilerServiceProvider extends LaravelProfilerServiceProvider
 {
 
-    protected function registerCors ()
+    protected function registerRoutes ()
     {
-        $this->app->register('Barryvdh\Cors\LumenServiceProvider');
+
+        $this->app->get('api/profiler/profiles', ['as' => 'profiler.profiles.list', 'uses' => Profiler::class . '@index']);
+        $this->app->get('api/profiler/profiles/{id}', ['as' => 'profiler.profiles.show', 'uses' => Profiler::class . '@show']);
+        $this->app->delete('api/profiler/profiles', ['as' => 'profiler.profiles.clear', 'uses' => Profiler::class . '@clear']);
     }
 }

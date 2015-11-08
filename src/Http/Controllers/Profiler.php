@@ -52,9 +52,9 @@ class Profiler extends Controller
     public function show($id)
     {
         try {
-            $profile = $this->profiler->getProfile($id);
+            $profile = (array)$this->profiler->getProfile($id);
 
-            if ($profile === null) {
+            if (!is_array($profile) || count($profile) === 0) {
                 return response()->json(['error' => 'Profile not found'], 404);
 
             }
