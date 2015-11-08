@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e43f2ad4f8ab9636e25cc56433e6fa18",
+    "hash": "5dcee47e6e3ce13df56d16b014a2e7e9",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -697,16 +697,16 @@
         },
         {
             "name": "ndrx/profiler",
-            "version": "dev-master",
+            "version": "v0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ndrx-io/profiler.git",
-                "reference": "aa777457feafd620d8dbba1632a1b6c3afe83c5e"
+                "reference": "3acdd4eebd41866dab934954820b2ebf0114aa88"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ndrx-io/profiler/zipball/aa777457feafd620d8dbba1632a1b6c3afe83c5e",
-                "reference": "aa777457feafd620d8dbba1632a1b6c3afe83c5e",
+                "url": "https://api.github.com/repos/ndrx-io/profiler/zipball/3acdd4eebd41866dab934954820b2ebf0114aa88",
+                "reference": "3acdd4eebd41866dab934954820b2ebf0114aa88",
                 "shasum": ""
             },
             "require": {
@@ -753,7 +753,7 @@
                 "ndrx",
                 "profiler"
             ],
-            "time": "2015-11-08 10:54:55"
+            "time": "2015-11-07 17:29:41"
         },
         {
             "name": "nesbot/carbon",
@@ -3608,9 +3608,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "ndrx/profiler": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
