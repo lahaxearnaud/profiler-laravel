@@ -20,10 +20,30 @@ $ composer require ndrx-io/profiler-laravel
 
 ## Usage
 
+### Register provider
+
 ``` php
-$skeleton = new \Ndrx\Skeleton\SkeletonClass();
-echo $skeleton->echoPhrase('Hello, Ndrx!');
+'providers' => [
+    // Other Service Providers
+    \Ndrx\Profiler\Laravel\LaravelProfilerServiceProvider::class
+]
 ```
+
+### Register facade
+
+``` php
+'aliases' => [
+    // Other aliases
+    'Profiler' => \Ndrx\Profiler\Laravel\ProfilerFacade::class
+]
+```
+### Publish config
+
+``` bash
+$ php artisan vendor:publish
+```
+
+### 
 
 ## Change log
 
