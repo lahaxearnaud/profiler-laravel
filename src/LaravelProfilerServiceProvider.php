@@ -11,24 +11,28 @@ namespace Ndrx\Profiler\Laravel;
 use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Support\Facades\Route;
 use Monolog\Logger;
-use Ndrx\Profiler\Collectors\Data\Context;
-use Ndrx\Profiler\Collectors\Data\CpuUsage;
-use Ndrx\Profiler\Collectors\Data\Duration;
-use Ndrx\Profiler\Collectors\Data\Log;
-use Ndrx\Profiler\Collectors\Data\PhpVersion;
-use Ndrx\Profiler\Collectors\Data\Request;
-use Ndrx\Profiler\Collectors\Data\Timeline;
 use Ndrx\Profiler\Components\Logs\Monolog;
-use Ndrx\Profiler\Laravel\Collectors\Data\Config;
-use Ndrx\Profiler\Laravel\Collectors\Data\Database;
-use Ndrx\Profiler\Laravel\Collectors\Data\Event;
-use Ndrx\Profiler\Laravel\Collectors\Data\User;
-use Ndrx\Profiler\Laravel\Http\Controllers\Profiler;
+use Ndrx\Profiler\DataSources\File;
+use Ndrx\Profiler\Laravel\Http\Controllers\Profiler as ProfilerController;
 use Ndrx\Profiler\NullProfiler;
 use Ndrx\Profiler\ProfilerFactory;
+use Ndrx\Profiler\ProfilerInterface;
+
 
 class LaravelProfilerServiceProvider extends \Illuminate\Support\ServiceProvider
 {
+
+    /**
+     * Perform post-registration booting of services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $this->publishes([
+            __DIR__ . '/../config/profiler.php', config_path('profiler')
+        ]);
+    }
 
     /**
      * Register the service provider.
@@ -37,39 +41,30 @@ class LaravelProfilerServiceProvider extends \Illuminate\Support\ServiceProvider
      */
     public function register()
     {
-        $this->app['hash'] = $this->app->share(function () {
-            return new BcryptHasher();
-        });
-        $enable = 1 == env('APP_DEBUG', false);
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/profiler.php', 'profiler'
+        );
+
+        if (!$this->app->bound('hash')) {
+            $hash = $this->app->share(function () {
+                return new BcryptHasher();
+            });
+            $this->app->bind('hash', $hash);
+        }
+
+        $config = $this->app->make('config');
+        $enable = $config->get('app.debug');
+        $enable = boolval($enable);
         /** @var Logger $logger */
         $logger = $this->app->make('log');
         try {
-            $profiler = ProfilerFactory::build([
-                ProfilerFactory::OPTION_ENABLE => $enable,
-                ProfilerFactory::OPTION_DATASOURCE_PROFILES_FOLDER => '/tmp/profiler/',
-                ProfilerFactory::OPTION_COLLECTORS => [
-                    PhpVersion::class,
-                    CpuUsage::class,
-                    Context::class,
-                    Duration::class,
-                    Timeline::class,
-                    Request::class,
-                    Log::class,
-                    Duration::class,
-                    Database::class,
-                    Config::class,
-                    Event::class,
-                    User::class,
-                ],
-
-                ProfilerFactory::OPTION_LOGGER => Monolog::class
-            ]);
+            $profiler = ProfilerFactory::build($this->buildConfiguration($enable));
         } catch (\Exception $e) {
-            $logger->alert('Fail to build profiler error=' . $e->getMessage(), [
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
+            dd('Fail to build profiler error: ' . $e->getMessage(), [
+                ' message : ' => $e->getMessage(),
+                ' file : ' => $e->getFile(),
+                ' line : ' => $e->getLine(),
+                ' trace : ' => $e->getTraceAsString()
             ]);
             $profiler = new NullProfiler();
         }
@@ -80,8 +75,41 @@ class LaravelProfilerServiceProvider extends \Illuminate\Support\ServiceProvider
             $this->registerRoutes();
         }
 
+        $this->registerProfiler($profiler);
+        $this->registerAlias();
         $profiler->initiate();
 
+    }
+
+    protected function buildConfiguration($enable)
+    {
+        $config = $this->app->make('config');
+
+        $datasource = $config->get('profiler.datasource');
+        $drivers = $config->get('profiler.drivers');
+
+        $configs = [
+            ProfilerFactory::OPTION_ENABLE => $enable,
+            ProfilerFactory::OPTION_COLLECTORS => $config->get('profiler.collectors'),
+            ProfilerFactory::OPTION_DATASOURCE_CLASS => $drivers[$datasource]['driver'],
+            ProfilerFactory::OPTION_LOGGER => Monolog::class
+        ];
+
+        if ($configs[ProfilerFactory::OPTION_DATASOURCE_CLASS] === File::class) {
+            $configs[ProfilerFactory::OPTION_DATASOURCE_PROFILES_FOLDER] = $drivers[$datasource]['folder'];
+        }
+
+        return $configs;
+    }
+
+    protected function registerAlias()
+    {
+        $this->app->alias(ProfilerFacade::class, 'Profiler');
+    }
+
+
+    protected function registerProfiler(ProfilerInterface $profiler)
+    {
         $this->app->instance('profiler', $profiler);
     }
 
@@ -89,15 +117,15 @@ class LaravelProfilerServiceProvider extends \Illuminate\Support\ServiceProvider
     {
         if (!headers_sent()) {
             header('Access-Control-Allow-Headers: *');
-            header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH');
+            header('Access-Control-Allow-Methods: GET, DELETE, HEAD');
         }
     }
 
     protected function registerRoutes()
     {
-        Route::get('api/profiler/profiles', ['as' => 'profiler.profiles.list', 'uses' => Profiler::class . '@index']);
-        Route::get('api/profiler/profiles/{id}', ['as' => 'profiler.profiles.show', 'uses' => Profiler::class . '@show']);
-        Route::delete('api/profiler/profiles', ['as' => 'profiler.profiles.clear', 'uses' => Profiler::class . '@clear']);
+        Route::get('api/profiler/profiles', ['as' => 'profiler.profiles.list', 'uses' => ProfilerController::class . '@index']);
+        Route::get('api/profiler/profiles/{id}', ['as' => 'profiler.profiles.show', 'uses' => ProfilerController::class . '@show']);
+        Route::delete('api/profiler/profiles', ['as' => 'profiler.profiles.clear', 'uses' => ProfilerController::class . '@clear']);
     }
 
 }

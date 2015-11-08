@@ -13,9 +13,22 @@ use Ndrx\Profiler\Laravel\Http\Controllers\Profiler;
 class LumenProfilerServiceProvider extends LaravelProfilerServiceProvider
 {
 
+    /**
+     * Perform post-registration booting of services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+    }
+
+    protected function registerAlias()
+    {
+        class_alias(ProfilerFacade::class, 'Profiler');
+    }
+
     protected function registerRoutes ()
     {
-
         $this->app->get('api/profiler/profiles', ['as' => 'profiler.profiles.list', 'uses' => Profiler::class . '@index']);
         $this->app->get('api/profiler/profiles/{id}', ['as' => 'profiler.profiles.show', 'uses' => Profiler::class . '@show']);
         $this->app->delete('api/profiler/profiles', ['as' => 'profiler.profiles.clear', 'uses' => Profiler::class . '@clear']);

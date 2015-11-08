@@ -11,58 +11,57 @@ namespace Ndrx\Profiler\Laravel\Test;
 
 use Illuminate\Support\Facades\App;
 
-class ApiTest extends TestCase
+class ApiDisableTest extends TestCase
 {
     public function createApplication()
     {
-        putenv('APP_DEBUG=true');
+        putenv('APP_DEBUG=false');
 
         return parent::createApplication();
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
     public function testAll()
     {
         $this->get('api/profiler/profiles');
-        $this->isJson();
-        $this->assertResponseOk();
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
     public function testAllError()
     {
         $this->get('api/profiler/profiles?' . http_build_query([
                 'offset' => -1
             ]));
-        $this->isJson();
-        $this->assertResponseStatus(400);
-
-        $this->get('api/profiler/profiles?' . http_build_query([
-                'limit' => -1
-            ]));
-        $this->isJson();
-        $this->assertResponseStatus(400);
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
     public function testOneNotFound()
     {
         $this->get('api/profiler/profiles/XXX');
-        $this->isJson();
-        $this->assertResponseStatus(404);
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
     public function testOne()
     {
         /** @var \Ndrx\Profiler\Profiler $profiler */
         $profiler = App::make('profiler');
         $idProcess = $profiler->getContext()->getProcess()->getId();
         $this->get('api/profiler/profiles/' . $idProcess);
-        $this->isJson();
-        $this->assertResponseStatus(200);
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
     public function testClear()
     {
         $this->delete('api/profiler/profiles');
-        $this->isJson();
-        $this->assertResponseOk();
     }
 }
