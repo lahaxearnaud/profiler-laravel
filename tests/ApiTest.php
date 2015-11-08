@@ -18,7 +18,7 @@ class ApiTest extends TestCase
     public function testAll()
     {
         $this->get('api/profiler/profiles');
-        $this->assertJson('');
+        $this->isJson();
         $this->assertResponseOk();
     }
 
@@ -33,14 +33,14 @@ class ApiTest extends TestCase
         $this->get('api/profiler/profiles?' . http_build_query([
                 'limit' => -1
             ]));
-        $this->assertJson('');
+        $this->isJson();
         $this->assertResponseStatus(400);
     }
 
     public function testOneNotFound()
     {
         $this->get('api/profiler/profiles/XXX');
-        $this->assertJson('');
+        $this->isJson();
         $this->assertResponseStatus(404);
     }
 
@@ -50,14 +50,14 @@ class ApiTest extends TestCase
         $profiler = App::make('profiler');
         $idProcess = $profiler->getContext()->getProcess()->getId();
         $this->get('api/profiler/profiles/' . $idProcess);
-        $this->assertJson('');
+        $this->isJson();
         $this->assertResponseStatus(200);
     }
 
     public function testClear()
     {
         $this->delete('api/profiler/profiles');
-        $this->assertJson('');
+        $this->isJson();
         $this->assertResponseOk();
     }
 }
