@@ -11,6 +11,8 @@ namespace Ndrx\Profiler\Laravel\Collectors\Data;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event as EventFacade;
 use Ndrx\Profiler\DataSources\Contracts\DataSourceInterface;
+use Ndrx\Profiler\Events\Timeline\End;
+use Ndrx\Profiler\Events\Timeline\Start;
 use Ndrx\Profiler\JsonPatch;
 use Ndrx\Profiler\Process;
 
@@ -38,6 +40,13 @@ class Database extends \Ndrx\Profiler\Collectors\Data\Database
     protected function registerListener()
     {
         EventFacade::listen('illuminate.query', function ($query, $bindings, $time, $connection) {
+            $runnableQuery = $this->createRunnableQuery($query, $bindings, $connection);
+
+            $queryId = uniqid();
+            $currentTime = microtime(true);
+            $this->process->getDispatcher()->dispatch(Start::EVENT_NAME, new Start($queryId, $runnableQuery, [], $currentTime - $time));
+            $this->process->getDispatcher()->dispatch(End::EVENT_NAME, new End($queryId), $currentTime);
+
             $explainResults = [];
             if (preg_match('/^(SELECT) /i', $query)) {
                 /** @var \PDO $pdo */
@@ -52,12 +61,13 @@ class Database extends \Ndrx\Profiler\Collectors\Data\Database
 
             $this->data[] = array(
                 'query' => $query,
-                'bindQuery' => $this->createRunnableQuery($query, $bindings, $connection),
+                'bindQuery' => $runnableQuery,
                 'bindings' => $bindings,
                 'duration' => $time,
                 'connection' => $connection,
                 'explain' => $explainResults
             );
+
 
             $this->stream();
         });

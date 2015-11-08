@@ -22,11 +22,6 @@ class LumenProfilerServiceProvider extends LaravelProfilerServiceProvider
     {
     }
 
-    protected function registerAlias()
-    {
-        class_alias(ProfilerFacade::class, 'Profiler');
-    }
-
     protected function registerRoutes ()
     {
         $this->app->get('api/profiler/profiles', ['as' => 'profiler.profiles.list', 'uses' => Profiler::class . '@index']);

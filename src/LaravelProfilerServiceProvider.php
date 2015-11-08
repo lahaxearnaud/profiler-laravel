@@ -76,7 +76,6 @@ class LaravelProfilerServiceProvider extends \Illuminate\Support\ServiceProvider
         }
 
         $this->registerProfiler($profiler);
-        $this->registerAlias();
         $profiler->initiate();
 
     }
@@ -101,12 +100,6 @@ class LaravelProfilerServiceProvider extends \Illuminate\Support\ServiceProvider
 
         return $configs;
     }
-
-    protected function registerAlias()
-    {
-        $this->app->alias(ProfilerFacade::class, 'Profiler');
-    }
-
 
     protected function registerProfiler(ProfilerInterface $profiler)
     {
