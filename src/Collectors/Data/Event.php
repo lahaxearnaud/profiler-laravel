@@ -9,9 +9,7 @@
 namespace Ndrx\Profiler\Laravel\Collectors\Data;
 
 use Illuminate\Support\Facades\Event as EventFacade;
-use Ndrx\Profiler\DataSources\Contracts\DataSourceInterface;
 use Ndrx\Profiler\JsonPatch;
-use Ndrx\Profiler\Process;
 
 /**
  *
@@ -21,25 +19,14 @@ use Ndrx\Profiler\Process;
 class Event extends \Ndrx\Profiler\Collectors\Data\Event
 {
     /**
-     * @param Process $process
-     * @param DataSourceInterface $dataSource
-     * @param JsonPatch|null $jsonPatch
-     */
-    public function __construct(Process $process, DataSourceInterface $dataSource, JsonPatch $jsonPatch = null)
-    {
-        parent::__construct($process, $dataSource, $jsonPatch);
-        $this->registerListener();
-    }
-
-    /**
      *
      */
-    protected function registerListener()
+    protected function registerListeners()
     {
         EventFacade::listen('*', function ($param) {
             $this->data [] = [
                 'name' => EventFacade::firing(),
-                'param' => json_encode($param),
+                'param' => $param,
                 'time' => microtime(true)
             ];
 

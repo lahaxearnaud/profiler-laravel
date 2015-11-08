@@ -10,6 +10,8 @@ namespace Ndrx\Profiler\Laravel\Test;
 
 
 use Illuminate\Support\Facades\App;
+use Ndrx\Profiler\Context\NullContext;
+use Ndrx\Profiler\Process;
 
 class ApiDisableTest extends TestCase
 {
@@ -53,6 +55,9 @@ class ApiDisableTest extends TestCase
     {
         /** @var \Ndrx\Profiler\Profiler $profiler */
         $profiler = App::make('profiler');
+        $this->assertInstanceOf(NullContext::class, $profiler->getContext());
+        $this->assertInstanceOf(Process::class, $profiler->getContext()->getProcess());
+
         $idProcess = $profiler->getContext()->getProcess()->getId();
         $this->get('api/profiler/profiles/' . $idProcess);
     }

@@ -9,6 +9,7 @@
 namespace Ndrx\Profiler\Laravel;
 
 use Illuminate\Hashing\BcryptHasher;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Monolog\Logger;
 use Ndrx\Profiler\Components\Logs\Monolog;
@@ -78,6 +79,12 @@ class LaravelProfilerServiceProvider extends \Illuminate\Support\ServiceProvider
         $this->registerProfiler($profiler);
         $profiler->initiate();
 
+        $profiler->getContext()->sendDebugIds();
+
+
+        Event::listen('kernel.handled', function () use ($profiler) {
+            $profiler->terminate();
+        });
     }
 
     protected function buildConfiguration($enable)

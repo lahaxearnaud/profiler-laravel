@@ -10,11 +10,9 @@ namespace Ndrx\Profiler\Laravel\Collectors\Data;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event as EventFacade;
-use Ndrx\Profiler\DataSources\Contracts\DataSourceInterface;
 use Ndrx\Profiler\Events\Timeline\End;
 use Ndrx\Profiler\Events\Timeline\Start;
 use Ndrx\Profiler\JsonPatch;
-use Ndrx\Profiler\Process;
 
 /**
  *
@@ -23,29 +21,19 @@ use Ndrx\Profiler\Process;
  */
 class Database extends \Ndrx\Profiler\Collectors\Data\Database
 {
-    /**
-     * @param Process $process
-     * @param DataSourceInterface $dataSource
-     * @param JsonPatch|null $jsonPatch
-     */
-    public function __construct(Process $process, DataSourceInterface $dataSource, JsonPatch $jsonPatch = null)
-    {
-        parent::__construct($process, $dataSource, $jsonPatch);
-        $this->registerListener();
-    }
 
     /**
      *
      */
-    protected function registerListener()
+    protected function registerListeners()
     {
         EventFacade::listen('illuminate.query', function ($query, $bindings, $time, $connection) {
             $runnableQuery = $this->createRunnableQuery($query, $bindings, $connection);
 
             $queryId = uniqid();
             $currentTime = microtime(true);
-            $this->process->getDispatcher()->dispatch(Start::EVENT_NAME, new Start($queryId, $runnableQuery, [], $currentTime - $time));
-            $this->process->getDispatcher()->dispatch(End::EVENT_NAME, new End($queryId), $currentTime);
+            $this->process->getDispatcher()->dispatch(Start::EVENT_NAME, new Start($queryId, $runnableQuery, null, $currentTime - $time));
+            $this->process->getDispatcher()->dispatch(End::EVENT_NAME, new End($queryId, $currentTime));
 
             $explainResults = [];
             if (preg_match('/^(SELECT) /i', $query)) {

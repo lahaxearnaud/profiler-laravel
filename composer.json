@@ -18,7 +18,7 @@
     ],
     "require": {
         "php" : ">=5.5.0",
-        "ndrx/profiler" : "~0.4",
+        "ndrx/profiler" : "~0.5",
         "laravel/framework": "~5.1"
     },
     "require-dev": {

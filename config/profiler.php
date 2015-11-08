@@ -11,7 +11,6 @@ return [
         \Ndrx\Profiler\Collectors\Data\PhpVersion::class,
         \Ndrx\Profiler\Collectors\Data\CpuUsage::class,
         \Ndrx\Profiler\Collectors\Data\Context::class,
-        \Ndrx\Profiler\Collectors\Data\Duration::class,
         \Ndrx\Profiler\Collectors\Data\Timeline::class,
         \Ndrx\Profiler\Collectors\Data\Request::class,
         \Ndrx\Profiler\Collectors\Data\Log::class,
@@ -20,6 +19,7 @@ return [
         \Ndrx\Profiler\Laravel\Collectors\Data\Config::class,
         \Ndrx\Profiler\Laravel\Collectors\Data\Event::class,
         \Ndrx\Profiler\Laravel\Collectors\Data\User::class,
+        \Ndrx\Profiler\Collectors\Data\Responses\Http::class
     ],
 
     'datasource' => 'file',
