@@ -8,7 +8,7 @@
 
 namespace Ndrx\Profiler\Laravel\Collectors\Data;
 
-use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Event as EventFacade;
 
 /**
  *
@@ -20,7 +20,7 @@ class Cache extends \Ndrx\Profiler\Collectors\Data\Cache
 
     protected function registerListeners()
     {
-        Event::listen('cache.hit', function ($key, $value) {
+        EventFacade::listen('cache.hit', function ($key, $value) {
             $this->data[] = [
                 'action' => 'get',
                 'success' => true,
@@ -30,7 +30,7 @@ class Cache extends \Ndrx\Profiler\Collectors\Data\Cache
             $this->stream();
         });
 
-        Event::listen('cache.missed', function ($key) {
+        EventFacade::listen('cache.missed', function ($key) {
             $this->data[] = [
                 'action' => 'get',
                 'success' => false,
@@ -40,7 +40,7 @@ class Cache extends \Ndrx\Profiler\Collectors\Data\Cache
             $this->stream();
         });
 
-        Event::listen('cache.write', function ($key, $value, $minutes) {
+        EventFacade::listen('cache.write', function ($key, $value, $minutes) {
             $this->data[] = [
                 'action' => 'put',
                 'value' => $value,
@@ -50,7 +50,7 @@ class Cache extends \Ndrx\Profiler\Collectors\Data\Cache
             $this->stream();
         });
 
-        Event::listen('cache.delete', function ($key) {
+        EventFacade::listen('cache.delete', function ($key) {
             $this->data[] = [
                 'action' => 'delete',
                 'key' => $key

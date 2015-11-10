@@ -8,7 +8,7 @@
 
 namespace Ndrx\Profiler\Laravel\Collectors\Data;
 
-use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Event as EventFacade;;
 use Illuminate\View\View;
 
 /**
@@ -21,7 +21,7 @@ class Template extends \Ndrx\Profiler\Collectors\Data\Template
 
     protected function registerListeners()
     {
-        Event::listen('composing: *', function (View $view) {
+        EventFacade::listen('composing: *', function (View $view) {
 
             $data = array_except($view->getData(), ['obLevel', '__env', 'app']);
             $this->data[] = [
