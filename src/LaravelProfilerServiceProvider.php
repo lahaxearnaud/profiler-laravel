@@ -10,6 +10,7 @@ namespace Ndrx\Profiler\Laravel;
 
 use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Monolog\Logger;
 use Ndrx\Profiler\Components\Logs\Monolog;
@@ -56,12 +57,14 @@ class LaravelProfilerServiceProvider extends \Illuminate\Support\ServiceProvider
         $config = $this->app->make('config');
         $enable = $config->get('app.debug');
         $enable = boolval($enable);
+        $profilerRequest = $this->isProfilerCall();
+
         /** @var Logger $logger */
         $logger = $this->app->make('log');
         try {
-            $profiler = ProfilerFactory::build($this->buildConfiguration($enable));
+            $profiler = ProfilerFactory::build($this->buildConfiguration($enable, $profilerRequest));
         } catch (\Exception $e) {
-            dd('Fail to build profiler error: ' . $e->getMessage(), [
+            $logger->error('Fail to build profiler error: ' . $e->getMessage(), [
                 ' message : ' => $e->getMessage(),
                 ' file : ' => $e->getFile(),
                 ' line : ' => $e->getLine(),
@@ -71,7 +74,10 @@ class LaravelProfilerServiceProvider extends \Illuminate\Support\ServiceProvider
         }
 
         if ($enable) {
-            $logger->getMonolog()->pushHandler($profiler->getLogger());
+            if (!$profilerRequest) {
+                $logger->getMonolog()->pushHandler($profiler->getLogger());
+            }
+
             $this->registerCors();
             $this->registerRoutes();
         }
@@ -87,7 +93,12 @@ class LaravelProfilerServiceProvider extends \Illuminate\Support\ServiceProvider
         });
     }
 
-    protected function buildConfiguration($enable)
+    protected function isProfilerCall()
+    {
+        return Request::is('api/profiler/profiles*');
+    }
+
+    protected function buildConfiguration($enable, $profilerRequest)
     {
         $config = $this->app->make('config');
 
@@ -96,7 +107,8 @@ class LaravelProfilerServiceProvider extends \Illuminate\Support\ServiceProvider
 
         $configs = [
             ProfilerFactory::OPTION_ENABLE => $enable,
-            ProfilerFactory::OPTION_COLLECTORS => $config->get('profiler.collectors'),
+            // no collector added if the request is on profiler
+            ProfilerFactory::OPTION_COLLECTORS => !$profilerRequest ? $config->get('profiler.collectors') : [],
             ProfilerFactory::OPTION_DATASOURCE_CLASS => $drivers[$datasource]['driver'],
             ProfilerFactory::OPTION_LOGGER => Monolog::class
         ];
