@@ -117,6 +117,7 @@ class LaravelProfilerServiceProvider extends \Illuminate\Support\ServiceProvider
             $configs[ProfilerFactory::OPTION_DATASOURCE_PROFILES_FOLDER] = $drivers[$datasource]['folder'];
         }
 
+        
         return $configs;
     }
 
