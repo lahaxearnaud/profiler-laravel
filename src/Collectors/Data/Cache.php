@@ -8,17 +8,11 @@
 
 namespace Ndrx\Profiler\Laravel\Collectors\Data;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
-use Ndrx\Profiler\DataSources\Contracts\DataSourceInterface;
-use Ndrx\Profiler\JsonPatch;
-use Ndrx\Profiler\Process;
 
 /**
- * @property \Illuminate\Auth\Authenticatable|Model $user
  *
- * Class User
+ * Class Cache
  * @package Ndrx\Profiler\Laravel\Collectors\Data
  */
 class Cache extends \Ndrx\Profiler\Collectors\Data\Cache
