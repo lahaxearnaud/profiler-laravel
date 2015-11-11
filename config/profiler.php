@@ -23,6 +23,7 @@ return [
         \Ndrx\Profiler\Collectors\Data\Included::class,
         \Ndrx\Profiler\Laravel\Collectors\Data\Cache::class,
         \Ndrx\Profiler\Laravel\Collectors\Data\Template::class,
+        \Ndrx\Profiler\Laravel\Collectors\Data\Route::class,
     ],
 
     'datasource' => 'file',
