@@ -123,9 +123,9 @@ class LaravelProfilerServiceProvider extends \Illuminate\Support\ServiceProvider
 
     protected function registerRoutes()
     {
-        Route::get('api/profiler/profiles', ['as' => 'profiler.profiles.list', 'uses' => ProfilerController::class . '@index']);
-        Route::get('api/profiler/profiles/{id}', ['as' => 'profiler.profiles.show', 'uses' => ProfilerController::class . '@show']);
-        Route::delete('api/profiler/profiles', ['as' => 'profiler.profiles.clear', 'uses' => ProfilerController::class . '@clear']);
+        Route::get('/_profiler/api/profiles', ['as' => 'profiler.profiles.list', 'uses' => ProfilerController::class . '@index']);
+        Route::get('/_profiler/api/profiles/{id}', ['as' => 'profiler.profiles.show', 'uses' => ProfilerController::class . '@show']);
+        Route::delete('/_profiler/api/profiles', ['as' => 'profiler.profiles.clear', 'uses' => ProfilerController::class . '@clear']);
     }
 
 }
