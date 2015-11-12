@@ -24,8 +24,8 @@ class LumenProfilerServiceProvider extends LaravelProfilerServiceProvider
 
     protected function registerRoutes ()
     {
-        $this->app->get('api/profiler/profiles', ['as' => 'profiler.profiles.list', 'uses' => Profiler::class . '@index']);
-        $this->app->get('api/profiler/profiles/{id}', ['as' => 'profiler.profiles.show', 'uses' => Profiler::class . '@show']);
-        $this->app->delete('api/profiler/profiles', ['as' => 'profiler.profiles.clear', 'uses' => Profiler::class . '@clear']);
+        $this->app->get('/_profiler/api/profiles', ['as' => 'profiler.profiles.list', 'uses' => Profiler::class . '@index']);
+        $this->app->get('/_profiler/api/profiles/{id}', ['as' => 'profiler.profiles.show', 'uses' => Profiler::class . '@show']);
+        $this->app->delete('/_profiler/api/profiles', ['as' => 'profiler.profiles.clear', 'uses' => Profiler::class . '@clear']);
     }
 }

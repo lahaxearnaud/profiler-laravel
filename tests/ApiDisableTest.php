@@ -27,7 +27,7 @@ class ApiDisableTest extends TestCase
      */
     public function testAll()
     {
-        $this->get('api/profiler/profiles');
+        $this->get('/_profiler/api/profiles');
     }
 
     /**
@@ -35,7 +35,7 @@ class ApiDisableTest extends TestCase
      */
     public function testAllError()
     {
-        $this->get('api/profiler/profiles?' . http_build_query([
+        $this->get('/_profiler/api/profiles?' . http_build_query([
                 'offset' => -1
             ]));
     }
@@ -45,7 +45,7 @@ class ApiDisableTest extends TestCase
      */
     public function testOneNotFound()
     {
-        $this->get('api/profiler/profiles/XXX');
+        $this->get('/_profiler/api/profiles/XXX');
     }
 
     /**
@@ -59,7 +59,7 @@ class ApiDisableTest extends TestCase
         $this->assertInstanceOf(Process::class, $profiler->getContext()->getProcess());
 
         $idProcess = $profiler->getContext()->getProcess()->getId();
-        $this->get('api/profiler/profiles/' . $idProcess);
+        $this->get('/_profiler/api/profiles/' . $idProcess);
     }
 
     /**
@@ -67,6 +67,6 @@ class ApiDisableTest extends TestCase
      */
     public function testClear()
     {
-        $this->delete('api/profiler/profiles');
+        $this->delete('/_profiler/api/profiles');
     }
 }

@@ -22,20 +22,20 @@ class ApiTest extends TestCase
 
     public function testAll()
     {
-        $this->get('api/profiler/profiles');
+        $this->get('/_profiler/api/profiles');
         $this->isJson();
         $this->assertResponseOk();
     }
 
     public function testAllError()
     {
-        $this->get('api/profiler/profiles?' . http_build_query([
+        $this->get('/_profiler/api/profiles?' . http_build_query([
                 'offset' => -1
             ]));
         $this->isJson();
         $this->assertResponseStatus(400);
 
-        $this->get('api/profiler/profiles?' . http_build_query([
+        $this->get('/_profiler/api/profiles?' . http_build_query([
                 'limit' => -1
             ]));
         $this->isJson();
@@ -44,7 +44,7 @@ class ApiTest extends TestCase
 
     public function testOneNotFound()
     {
-        $this->get('api/profiler/profiles/XXX');
+        $this->get('/_profiler/api/profiles/XXX');
         $this->isJson();
         $this->assertResponseStatus(404);
     }
@@ -54,14 +54,14 @@ class ApiTest extends TestCase
         /** @var \Ndrx\Profiler\Profiler $profiler */
         $profiler = App::make('profiler');
         $idProcess = $profiler->getContext()->getProcess()->getId();
-        $this->get('api/profiler/profiles/' . $idProcess);
+        $this->get('/_profiler/api/profiles/' . $idProcess);
         $this->isJson();
         $this->assertResponseStatus(200);
     }
 
     public function testClear()
     {
-        $this->delete('api/profiler/profiles');
+        $this->delete('/_profiler/api/profiles');
         $this->isJson();
         $this->assertResponseOk();
     }
