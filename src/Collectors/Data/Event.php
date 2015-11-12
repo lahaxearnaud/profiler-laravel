@@ -33,15 +33,4 @@ class Event extends \Ndrx\Profiler\Collectors\Data\Event
             $this->stream();
         });
     }
-
-    /**
-     * Write data in the datasource and clean current buffer
-     * @return mixed
-     */
-    public function stream()
-    {
-        $patch = $this->jsonPatch->generate($this->getPath(), JsonPatch::ACTION_ADD, $this->data, true);
-        $this->dataSource->save($this->process, [$patch]);
-        $this->data = [];
-    }
 }

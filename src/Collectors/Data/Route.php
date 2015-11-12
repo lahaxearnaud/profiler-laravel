@@ -7,7 +7,6 @@
  */
 
 namespace Ndrx\Profiler\Laravel\Collectors\Data;
-use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Support\Facades\App;
 
 /**
@@ -30,7 +29,6 @@ class Route extends \Ndrx\Profiler\Collectors\Data\Route
             $middleware = array_unique(array_values($route->middleware()));
 
             $this->data[] = array(
-                'host'   => $route->domain(),
                 'method' => implode('|', $route->methods()),
                 'uri'    => $route->uri(),
                 'name'   => $route->getName(),
