@@ -19,7 +19,11 @@ return [
         \Ndrx\Profiler\Laravel\Collectors\Data\Config::class,
         \Ndrx\Profiler\Laravel\Collectors\Data\Event::class,
         \Ndrx\Profiler\Laravel\Collectors\Data\User::class,
-        \Ndrx\Profiler\Collectors\Data\Responses\Http::class
+        \Ndrx\Profiler\Collectors\Data\Responses\Http::class,
+        \Ndrx\Profiler\Collectors\Data\Included::class,
+        \Ndrx\Profiler\Laravel\Collectors\Data\Cache::class,
+        \Ndrx\Profiler\Laravel\Collectors\Data\Template::class,
+        \Ndrx\Profiler\Laravel\Collectors\Data\Route::class,
     ],
 
     'datasource' => 'file',
