@@ -43,6 +43,14 @@ $ composer require ndrx-io/profiler-laravel
 $ php artisan vendor:publish
 ```
 
+### Register middleware
+
+``` php
+    protected $middleware = [
+        //...
+        \Ndrx\Profiler\Laravel\Http\Middleware\Profiler::class
+    ];
+```
 ### 
 
 ## Change log
